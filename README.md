@@ -1,8 +1,8 @@
 # VideoSearch Reasoner: Boosting Multimodal Reward Models through Thinking-with-Image Reasoning
 
 ## Overview
-![overview](./figs/teaser1.pdf)
-![Qualitative Case](./figs/teaser2.pdf)
+![overview](./figs/teaser1.png)
+![Qualitative Case](./figs/teaser2.png)
 
 <details><summary>Abstract</summary> 
 # VideoSearch Reasoner
