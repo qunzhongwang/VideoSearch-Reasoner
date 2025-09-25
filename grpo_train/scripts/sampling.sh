@@ -15,12 +15,9 @@ GPUS_PER_NODE=8
 MASTER_HOST="$VC_WORKER_HOSTS"
 MASTER_ADDR="${VC_WORKER_HOSTS%%,*}"
 export WANDB_MODE="online"
-export WANDB_ENTITY="KwaiAiTraining"
 
-# export WANDB_MODE="offline"
-export WANDB_API_KEY="3dbc775adc29b69a265695208f388b57bded77f0"
-# export NCCL_SOCKET_IFNAME=ens2f5
-# export GLOO_SOCKET_IFNAME=${NCCL_SOCKET_IFNAME}
+export WANDB_ENTITY=""
+export WANDB_API_KEY=""
 export NCCL_NET_PLUGIN=none
 export NCCL_IB_TIMEOUT=22
 export NCCL_IB_RETRY_CNT=15
@@ -29,7 +26,6 @@ export CUDA_LAUNCH_BLOCKING=1
 export HOST_IP=0.0.0.0
 export VLLM_HOST_IP=0.0.0.0
 
-working_dir=${working_dir:-"/path/to/PixelReasoner"}
 cd $working_dir
 export HF_ENDPOINT=https://hf-mirror.com
 nnode=$WORLD_SIZE
@@ -44,7 +40,7 @@ factor=${factor:-"1"}
 eval_bsz=${eval_bsz:-"8"}
 export MIN_PIXELS=$(( 256 * 28 * 28))
 export MAX_PIXELS=$(( 1280 * 28 * 28))
-tag=${tagname} # -n${nsamples}
+tag=${tagname}
 rule_reward=${rule:-"none"}
 sys=${sys:-"default"}
 lr=${lr:-"10"}
@@ -53,20 +49,15 @@ dataver=${dataver:-"none"}
 util=${util:-"0.9"}
 
 numref=0
-
-maxlen=${maxlen:-"32768"} #32768
+maxlen=${maxlen:-"32768"}
 policy=${policy:-"/path/to/policy"}
-save_name="${tag}" # rbsize 1024->256
+save_name="${tag}"
 DATASET=${testdata}
 MODEL_CPK_NAME=${save_name}
 PRETRAIN_MODEL=${policy}
 savefolder=${savefolder:-"eval_results"}
 SAVE_PATH=$working_dir/${savefolder}/$save_name
 mkdir -p "${SAVE_PATH}"
-
-# python=/home/ma-user/anaconda3/envs/rethinker/bin/python
-# source /home/ma-user/anaconda3/bin/activate
-# conda activate rethinker
 
 
 
@@ -113,8 +104,6 @@ else
 fi
 
 LD_LIBRARY_PATH_VALUE=$nvj_path:$LD_LIBRARY_PATH
-# LD_LIBRARY_PATH_VALUE=/path/to/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
-
 RUNTIME_ENV_JSON="{\"pip\": [\"Qwen-Agent\"], \"env_vars\": {\"RAY_DEBUG\": \"legacy\", \"LD_LIBRARY_PATH\": \"$LD_LIBRARY_PATH_VALUE\"}}"
 
 

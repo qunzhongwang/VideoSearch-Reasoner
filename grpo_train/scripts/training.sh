@@ -4,7 +4,6 @@
 #  * Licensed under the Apache License, Version 2.0 (the "License");
 #  */
 
-
 set -x
 
 
@@ -12,19 +11,10 @@ find_interface() {
   local ip_output=$(ip addr show | head -n 10) # Limit to first 10 lines
   local selected_interface=""
 
-  # Debug output (can be removed in final version)
-  # echo "--- First 10 lines of ip addr show output: ---"
-  # echo "$ip_output"
-  # echo "--- End of ip addr show output ---"
-
   while IFS= read -r line; do
-    # Debug output (can be removed in final version)
-    # echo "Processing line: $line"
-
     if [[ "$line" =~ ^[0-9]+:\ ([^:]+):\ \<.*UP.*\> ]]; then
       local interface_name="${BASH_REMATCH[1]}"
       # Debug output (can be removed in final version)
-      # echo "  Interface found: $interface_name"
       local interface_up=true
       local is_loopback=false
 
@@ -104,8 +94,6 @@ find_interface() {
   fi
 }
 
-# export TORCHDYNAMO_DISABLE=1
-
 MULTINODE_FLAG=True
 if [ -v MULTINODE_FLAG ]; then 
     # Define a string
@@ -128,23 +116,19 @@ else
 fi
 MASTER_HOST="$VC_WORKER_HOSTS"
 MASTER_ADDR="${VC_WORKER_HOSTS%%,*}"
-# export NCCL_SOCKET_IFNAME=ens2f5
-# export GLOO_SOCKET_IFNAME=${NCCL_SOCKET_IFNAME}
 export NCCL_NET_PLUGIN=none
 export NCCL_IB_TIMEOUT=40
 export NCCL_IB_RETRY_CNT=15
 export NCCL_DEBUG=INFO
 export CUDA_LAUNCH_BLOCKING=1
-# export NCCL_P2P_DISABLE=1
 export TORCH_NCCL_TRACE_BUFFER_SIZE=33554432
 export NCCL_TIMEOUT=7200 
 export HOST_IP=0.0.0.0
 export VLLM_HOST_IP=0.0.0.0
 
-# working_dir=
 cd $working_dir
 export HF_ENDPOINT=https://hf-mirror.com
-# export WANDB_API_KEY=""
+
 nnode=$WORLD_SIZE
 tagname=${tagname:-""}
 dataver=${dataver:-"none"}
@@ -190,8 +174,6 @@ PRETRAIN_MODEL=${policy}
 testdata="${working_dir}/data/${benchmark3}.parquet"
 SAVE_PATH=$working_dir/saves/$save_name
 mkdir -p "${SAVE_PATH}"
-# pip install -U deepspeed==0.15.0 # https://github.com/OpenRLHF/OpenRLHF/issues/776#issuecomment-2694472824
-# 
 
 
 post_args=""
@@ -223,20 +205,15 @@ else
             --rollout_batch_size ${rbuffer}
     )
 fi
-# :/usr/local/cuda/targets/x86_64-linux/lib
+
 LD_LIBRARY_PATH_VALUE=/path/to/nvidia/nvjitlink/lib:$LD_LIBRARY_PATH
 export BNB_CUDA_VERSION=122
 RUNTIME_ENV_JSON="{\"env_vars\": {\"LD_LIBRARY_PATH\": \"$LD_LIBRARY_PATH_VALUE\"}}"
 
 
 if [ "$NODE_RANK" = "0" ]; then
-    # Start Ray head node and capture the output
     ray_output=$(ray start --head --num-gpus 8)
-
-    # Extract the IP address using grep and sed
     ip_address=$(echo "$ray_output" | grep -oP "ray start --address='\K[^']+")
-
-    # Write the extracted IP address to a file named "ip.txt"
     mkdir -p ip_tmp
     echo "$ip_address" > ip_tmp/ip_${tagname}.txt
     cat ip_tmp/ip_${tagname}.txt
@@ -296,7 +273,7 @@ if [ "$NODE_RANK" = "0" ]; then
     --system_prompt ${sys} \
     --use_kl_estimator_k3 \
     --wandb_project vlm-rl \
-    --wandb_org KwaiAiTraining \
+    --wandb_org "" \
     --buffer_norm 0 \
     --train_vlm \
     --filter ${filter} \
@@ -305,7 +282,7 @@ if [ "$NODE_RANK" = "0" ]; then
     --loss_version ${lossver} \
     --format ${fmt} \
     --disable_ds_ckpt \
-    --use_wandb "3dbc775adc29b69a265695208f388b57bded77f0" \
+    --use_wandb "" \
     --resume_step ${resume_step} \
     --reinit_wanb ${reinit_wanb} \
     --collect_method ${collect_method} \
@@ -313,15 +290,6 @@ if [ "$NODE_RANK" = "0" ]; then
     --micro_rollout_eval_batch_size ${micro_rollout_eval_batch_size} \
     --old_rollout_batch_size ${old_rollout_batch_size} \
     ${post_args[@]} 
-   # --train_vlm 
-   # --disable_fast_tokenizer \
-   #     --use_wandb $WANDB_API_KEY \
-   #     --load_checkpoint \
-   #     --disable_ds_ckpt \
-   # --enforce_eager \
-   #     --prompt_data $DATASET \
-  # --prompt_data_probs "0.5,0.5" \
-
 else 
     sleep 15 
     # Read the IP address from the file and assign it to the variable "head_ip"

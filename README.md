@@ -2,9 +2,9 @@
 
 ## Overview
 ![overview](./figs/teaser1.png)
+
 ![Qualitative Case](./figs/teaser2.png)
 
-<details><summary>Abstract</summary> 
 # VideoSearch Reasoner
 
 Recent advancements in multimodal reward models (RMs) have substantially improved post-training for visual generative models. However, current RMs face inherent limitations:
@@ -34,7 +34,6 @@ A 7B VideoSearch Reasoner achieves:
 - **75.6%** on MJ-Bench-Video
 
 These results validate the effectiveness and promise of thinking-with-image multimodal reward modeling.
-</details>
 
 ## 🚀Quick Start
 We proposed 3-staged post-training. The Cold Start and Rejection Sampling Fine-Tuning Code is adapted from Open-R1. The GRPO Train Code is adapted from PixelReasoner.
@@ -60,6 +59,7 @@ Follow these steps to start the instruction tuning process:
 2. **Configuration**
    - configure model and data path in sft.sh 
    - use specific data for Cold Start and Rejection sampling respectively
+   - configure corresponding environment variables
 
 3. **Launch Training**
    ```bash
@@ -68,17 +68,30 @@ Follow these steps to start the instruction tuning process:
 
 4. **Data Sampling**
 
-For Rejection Sampling Fine-Tuning, we need to sample and filter data. To Sampling from VideoSearch Reasoner checkpoint:
+   For Rejection Sampling Fine-Tuning, we need to sample and filter data. To Sampling from VideoSearch Reasoner checkpoint:
    ```bash
    cd grpo_train
    bash sampling.sh
    ```
 
-### Running Curiosity-Driven RL
+### Running GRPO Training
 
-Run the following for training
+1. **Installation**
+   ```bash
+   cd grpo_train
+   conda create -n videosearch_grpo ython=3.10
+   pip install -e .[vllm]
+   pip install flash_attn --no-build-isolation
+   ```
 
-```bash
-cd curiosity_driven_rl
-bash ./scripts/training.sh
-```
+2. **Configuration**
+   - configure model and data path in training.sh 
+   - configure corresponding environment variables
+
+   Run the following for training
+
+3. **Launch Training**
+   ```bash
+   cd curiosity_driven_rl
+   bash ./scripts/training.sh
+   ```

@@ -3,7 +3,6 @@ export WANDB_PROJECT=vlm-r1-sft
 
 export DEBUG_MODE="true"
 export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-export CUDA_VISIBLE_DEVICES=0
 export NCCL_P2P_DISABLE=1
 export NCCL_DEBUG=INFO
 export WANDB_API_KEY=""
